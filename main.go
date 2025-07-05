@@ -68,12 +68,13 @@ func validateInput(path string) error {
 
 // cek apakah file output tersebut ada atau tidak
 func validateOutput(path string) error {
-	if _, err := os.Stat(path); os.IsExist(err) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		// File tidak ada, langsung lanjutkan eksekusi
 		return nil
 	}
 
+	// File sudah ada, minta konfirmasi untuk menimpa
 	fmt.Println("File sudah ada di lokasi")
-
 	confirmOverwrite()
 	return nil
 }
