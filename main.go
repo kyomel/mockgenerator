@@ -30,22 +30,25 @@ func main() {
 	}
 
 	if err := validateInput(inputPath); err != nil {
-		fmt.Printf("invalid input: %s \n", err)
+		fmt.Printf("invalid input: %s \n", err.Error())
 		os.Exit(0)
 	}
 
 	if err := validateOutput(outputPath); err != nil {
-		fmt.Printf("invalid output: %s \n", err)
+		fmt.Printf("invalid output: %s \n", err.Error())
 		os.Exit(0)
 	}
 
 	var mapping map[string]string
 	if err := readInput(inputPath, &mapping); err != nil {
-		fmt.Printf("gagal membaca input %s \n", err)
+		fmt.Printf("gagal membaca input %s \n", err.Error())
 		os.Exit(0)
 	}
 
-	fmt.Println(mapping)
+	if err := validateType(mapping); err != nil {
+		fmt.Printf("gagal memvalidasi data: %s \n", err.Error())
+		os.Exit(0)
+	}
 }
 
 func printUsage() {
@@ -76,7 +79,7 @@ func validateOutput(path string) error {
 }
 
 func confirmOverwrite() {
-	fmt.Println("Apakah anda ingin menimpa file yang sudah ada (y/t)")
+	fmt.Print("Apakah anda ingin menimpa file yang sudah ada (y/t)")
 
 	reader := bufio.NewReader(os.Stdin)
 	response, _ := reader.ReadString('\n')
@@ -89,7 +92,7 @@ func confirmOverwrite() {
 }
 
 func readInput(path string, mapping *map[string]string) error {
-	if path == "" {
+	if path == " " {
 		return errors.New("path tidak valid")
 	}
 
@@ -115,6 +118,24 @@ func readInput(path string, mapping *map[string]string) error {
 
 	if err := json.Unmarshal(fileByte, &mapping); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func validateType(mapping map[string]string) error {
+	// pengecekan value dari mapping apakah ada di supported
+	supported := map[string]bool{
+		"name":    true,
+		"address": true,
+		"phone":   true,
+		"date":    true,
+	}
+
+	for _, value := range mapping {
+		if !supported[value] {
+			return errors.New("tipe data tidak didukung")
+		}
 	}
 
 	return nil
