@@ -9,6 +9,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"github.com/kyomel/mockgenerator/data"
 )
 
 func main() {
@@ -137,15 +139,8 @@ func readInput(path string, mapping *map[string]string) error {
 
 func validateType(mapping map[string]string) error {
 	// pengecekan value dari mapping apakah ada di supported
-	supported := map[string]bool{
-		"name":    true,
-		"address": true,
-		"phone":   true,
-		"date":    true,
-	}
-
 	for _, value := range mapping {
-		if !supported[value] {
+		if !data.Supported[value] {
 			return errors.New("tipe data tidak didukung")
 		}
 	}
@@ -157,7 +152,7 @@ func generateOutput(mapping map[string]string) (map[string]any, error) {
 	result := make(map[string]any)
 
 	for key, dataType := range mapping {
-		result[key] = fmt.Sprintf("%s palsu", dataType)
+		result[key] = data.Generate(dataType)
 	}
 
 	return result, nil
